@@ -12,13 +12,13 @@ from my_planning_graph import PlanningGraph
 
 def check_member(action, fs):
         
-        for pre in action.precond_pos:
-            if pre not in fs.pos:
-                return False
-        for pre in action.precond_neg:
-            if pre not in fs.neg:
-                return False
-        return True
+    for pre in action.precond_pos:
+        if pre not in fs.pos:
+            return False
+    for pre in action.precond_neg:
+        if pre not in fs.neg:
+            return False
+    return True
     
 
 class AirCargoProblem(Problem):
@@ -74,8 +74,7 @@ class AirCargoProblem(Problem):
                 for a in self.airports:
                     for p in self.planes:
                         precond_pos = [expr("At({}, {})".format(p, a)),
-                                       expr("At({}, {})".format(c, a)),
-                                           ]
+                                       expr("At({}, {})".format(c, a))]
                         precond_neg = []
                         effect_add = [expr("In({}, {})".format(c, p))]
                         effect_rem = [expr("At({}, {})".format(c, a))]
@@ -96,8 +95,7 @@ class AirCargoProblem(Problem):
                 for a in self.airports:
                     for p in self.planes:
                         precond_pos = [expr("At({}, {})".format(p, a)),
-                                       expr("In({}, {})".format(c, a)),
-                                           ]
+                                       expr("In({}, {})".format(c, p))]
                         precond_neg = []
                         effect_add = [expr("At({}, {})".format(c, a))]
                         effect_rem = [expr("In({}, {})".format(c, p))]
