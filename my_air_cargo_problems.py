@@ -212,10 +212,13 @@ class AirCargoProblem(Problem):
         #state = node.state
         goals = list(self.goal)
         for action in self.actions_list:
+            added = False
             for effect in action.effect_add:
                 if effect in goals:
-                    count += 1
                     goals.remove(effect)
+                    if not added:
+                        count += 1
+                        added = True
                     if len(goals) == 0:
                         return count
         return count

@@ -311,6 +311,35 @@ class PlanningGraph():
         #   set iff all prerequisite literals for the action hold in S0.  This can be accomplished by testing
         #   to see if a proposed PgNode_a has prenodes that are a subset of the previous S level.  Once an
         #   action node is added, it MUST be connected to the S node instances in the appropriate s_level set.
+        '''
+        test_set = set()
+        node = self.s_levels[level].pop()
+        print('node children ', node.children)
+        test_set.add(node)
+        print("test set ", test_set)
+        print(test_set.pop().children)
+        node.children.add(4)
+        print('node children ', node.children)
+        test_set.add(node)
+        print("test set ", test_set)
+        print(test_set.pop().children)
+        '''
+        all_nodes = []
+        last_level = [node.literal for node in self.s_levels[level]]
+        for action in self.all_actions:
+            pre_neg = [expr('~{}'.format(cond)) for cond in action.precond_neg]
+            all_conditions = action.precond_pos + pre_neg
+            if all([condition in last_level for condition in all_conditions]):
+                action_node = PgNode_a(action)
+                for node in self.s_levels[level]:
+                    if node.literal in all_conditions:
+                        node.children.add(action_node)
+                        action_node.parents.add(node)
+                        self.s_levels[level].add(node)
+                
+                all_nodes.append(action_node)
+        self.a_levels.append(set(all_nodes))
+                        
 
     def add_literal_level(self, level):
         ''' add an S (literal) level to the Planning Graph
@@ -329,7 +358,27 @@ class PlanningGraph():
         #   may be "added" to the set without fear of duplication.  However, it is important to then correctly create and connect
         #   all of the new S nodes as children of all the A nodes that could produce them, and likewise add the A nodes to the
         #   parent sets of the S nodes
+        all_nodes = []
+        last_level = [node for node in self.a_levels[level-1]]
+        for action_node in last_level:
+            for node in action_node.effnodes:
+                if node not in all_nodes:
+                    all_nodes.append(node)
+                    node.parents.add(action_node)
+                    all_nodes.append(node)
+                    action_node.children.add(node)
+                    self.a_levels[level-1].add(action_node)
+                else:
+                    index = all_nodes.index(node)
+                    old_node = all_nodes[index]
+                    old_node.parents.add(action_node)
+                    action_node.children.add(old_node)
+                    self.a_levels[level-1].add(action_node)
+                
+        self.s_levels.append(set(all_nodes))
 
+        
+        
     def update_a_mutex(self, nodeset):
         ''' Determine and update sibling mutual exclusion for A-level nodes
 
