@@ -208,21 +208,12 @@ class AirCargoProblem(Problem):
         executed.
         '''
         # TODO implement (see Russell-Norvig Ed-3 10.2.3  or Russell-Norvig Ed-2 11.2)
-        count = 0
-        #state = node.state
+       
         goals = list(self.goal)
-        for action in self.actions_list:
-            added = False
-            for effect in action.effect_add:
-                if effect in goals:
-                    goals.remove(effect)
-                    if not added:
-                        count += 1
-                        added = True
-                    if len(goals) == 0:
-                        return count
-        return count
-
+        fs = decode_state(node.state, self.state_map)
+        passed = [state for state in fs.pos if state in goals]
+        return (len(goals) - len(passed))
+    
 
 def air_cargo_p1() -> AirCargoProblem:
     cargos = ['C1', 'C2']
